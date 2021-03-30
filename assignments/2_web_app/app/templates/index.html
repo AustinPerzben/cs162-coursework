@@ -23,72 +23,141 @@
 
     <div class="container">
         <h1 class="font-weight-light text-light pt-5 text-center">Welcome to your Kanban Board!</h1>
-        <div style="justify-content:space-around" class="row flex-row flex-sm-nowrap py-5">
-            <div style="width:30%" class="col-sm-6 col-md-4 col-xl-3">
+        <div class="row flex-row flex-sm-nowrap justify-content-center py-5">
+            <div class="col-sm-6 col-md-4 col-xl-3">
                 <div class="card bg-light">
                     <div class="card-body">
                         <h6 class="card-title text-uppercase text-center text-truncate py-2">To Do</h6>
-                        <div class="items border border-light">
-                            <div class="card draggable shadow-sm" id="cd1" draggable="true" ondragstart="drag(event)">
+                        {% for todo in todos %}
+                        <div class="items mb-3">
+                            <div class="card draggable shadow-sm" id="{{ todo.id }}" draggable="true">
                                 <div class="card-body p-2">
                                     <div class="card-title">
-                                        <a href="" class="lead font-weight-light">TSK-154</a>
+                                        <form action="{{ url_for('del_task') }}" method="POST">
+                                            <input type="hidden" name="task_id" value="{{ todo.id }}" />
+                                            <input type="submit"
+                                                class="close float-right text-danger bg-transparent border-0"
+                                                value="&times;" />
+                                        </form>
+                                        <a href="#makeTask" data-toggle="modal" data-title="TITLE"
+                                            data-content="CONTENT" class="lead font-weight-light">{{
+                                            todo.title }}</a>
                                     </div>
-                                    <p>
-                                        This is a description of a item on the board.
-                                    </p>
-                                    <button class="btn btn-primary btn-sm">View</button>
+                                    <p id="{{ todo.id }}-content">{{ todo.content }}</p>
                                 </div>
                             </div>
                         </div>
+                        {% endfor %}
                     </div>
-
                 </div>
             </div>
-            <div style="width:30%" class="col-sm-6 col-md-4 col-xl-3">
+            <div class="col-sm-6 col-md-4 col-xl-3">
                 <div class="card bg-light">
                     <div class="card-body">
-                        <h6 class="card-title text-uppercase text-center text-truncate py-2">In Progress</h6>
-                        <div class="items border border-light">
-                            <div class="card draggable shadow-sm" id="cd1" draggable="true" ondragstart="drag(event)">
+                        <h6 class="card-title text-uppercase text-center text-truncate py-2">Doing</h6>
+                        {% for doing in doings %}
+                        <div class="items mb-3">
+                            <div class="card draggable shadow-sm" id="{{ doing.id }}" draggable="true">
                                 <div class="card-body p-2">
                                     <div class="card-title">
-                                        <button class="btn btn-outline-danger float-right">Delete</button>
-                                        <a href="" class="lead font-weight-light">TSK-154</a>
+                                        <form action="{{ url_for('del_task') }}" method="POST">
+                                            <input type="hidden" name="task_id" value="{{ doing.id }}" />
+                                            <input type="submit"
+                                                class="close float-right text-danger bg-transparent border-0"
+                                                value="&times;" />
+                                            <a href="#makeTask" class="lead font-weight-light">{{ doing.title }}</a>
+                                        </form>
                                     </div>
-                                    <p>
-                                        This is a description of a item on the board.
-                                    </p>
-                                    <button class="btn btn-primary btn-sm">Remove</button>
+                                    <p>{{ doing.content }}</p>
                                 </div>
                             </div>
                         </div>
+                        {% endfor %}
                     </div>
-
                 </div>
             </div>
-            <div style="width:30%" class="col-sm-6 col-md-4 col-xl-3">
+            <div class="col-sm-6 col-md-4 col-xl-3">
                 <div class="card bg-light">
                     <div class="card-body">
                         <h6 class="card-title text-uppercase text-center text-truncate py-2">Done</h6>
-                        <div class="items border border-light">
-                            <div class="card draggable shadow-sm" id="cd1" draggable="true" ondragstart="drag(event)">
+                        {% for done in dones %}
+                        <div class="items mb-3">
+                            <div class="card draggable shadow-sm" id="{{ done.id }}">
                                 <div class="card-body p-2">
                                     <div class="card-title">
-                                        <a href="" class="lead font-weight-light">TSK-154</a>
+                                        <form action="{{ url_for('del_task') }}" method="POST">
+                                            <input type="hidden" name="task_id" value="{{ done.id }}" />
+                                            <input type="submit"
+                                                class="close float-right text-danger bg-transparent border-0"
+                                                value="&times;" />
+                                            <a href="#makeTask" class="lead font-weight-light">{{ done.title
+                                                }}</a>
+                                        </form>
                                     </div>
-                                    <p>
-                                        This is a description of a item on the board.
-                                    </p>
-                                    <button class="btn btn-primary btn-sm">View</button>
+                                    <p>{{ done.content }}</p>
                                 </div>
                             </div>
                         </div>
+                        {% endfor %}
                     </div>
+                </div>
+            </div>
 
+
+            <!-- Modal -->
+            <div class="modal fade" id="makeTask" role="dialog">
+                <div class="modal-dialog">
+
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <form class="form content" method="POST" action="{{ url_for('new_task') }}" values="todo">
+                            <div class="modal-header">
+                                <input type="text" class="modal-title border-0 form-control-lg shadow-none"
+                                    name="taskTitle" placeholder="Task Title" />
+                                <input type="button" class="close float-right bg-transparent border-0"
+                                    data-dismiss="modal" value="&times;" />
+                            </div>
+                            <div class="modal-body justify-content-between">
+                                <textarea rows="5" class="form-control shadow-none border-dark" name="taskContent"
+                                    placeholder="Task Description" maxlength="250"></textarea>
+                                <div class="list-group-horizontal pl-1 mt-3">
+                                    <span>
+                                        <input type="radio" name="panel" value="todo" id="todo-radio" checked />
+                                        <label for=" todo-radio">TO DO</label>
+                                    </span>
+                                    <span>
+                                        <input type="radio" name="panel" value="doing" id="doing-radio" />
+                                        <label for="doing-radio">DOING</label>
+                                    </span>
+                                    <span>
+                                        <input type="radio" name="panel" value="done" id="done-radio" />
+                                        <label for="done-radio">DONE</label>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <input type="submit" class="btn btn-primary float-right align-bottom"
+                                    value="Create Task" />
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
+        <div class="row flex-row justify-content-center">
+            <div style="width:40%" class="align-content-center mt-2">
+                <form data-toggle="modal" data-target="#makeTask" method="dialog">
+                    <input type="submit" style="width:100%" class="btn btn-primary btn-sm" value="New Task" />
+                </form>
+            </div>
+            <div style="width:40%" class="align-content-center mt-2">
+                <form action="{{ url_for('test') }}" method="POST">
+                    <input type="submit" style="width:100%" class="btn btn-primary btn-sm" value="Test Modal Page" />
+                </form>
+            </div>
+        </div>
+
+    </div>
     </div>
 
 </body>

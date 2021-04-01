@@ -33,7 +33,7 @@ def index():
 def new_task():
     if request.method == "POST":
         task = Task(
-            title=request.form['title'], content=request.form['description'], panel=request.form['panel'])
+            title=request.form['title'], content=request.form['content'], panel=request.form['panel'])
         db.session.add(task)
         db.session.commit()
 
@@ -42,18 +42,24 @@ def new_task():
 
 @kanban.route("/del_task", methods=["POST"])
 def del_task():
-    if request.method == "POST":
-        task_id = request.form['task_id']
-        # print(task_id)
-        task = Task.query.filter_by(id=task_id)
-        task.delete()
-        db.session.commit()
+    task_id = request.form['task_id']
+    # print(task_id)
+    task = Task.query.filter_by(id=task_id)
+    task.delete()
+    db.session.commit()
     return redirect(url_for('index'))
 
 
-@kanban.route("/test", methods=["POST"])
-def test():
-    return render_template("test.html")
+@kanban.route("/move_task", methods=["POST"])
+def move_task():
+    task_id = request.form['task_id']
+    task = Task.query.filter_by(id=task_id).first_or_404()
+    task.panel = request.form['panel']
+    db.session.add(task)
+    db.session.commit()
+    print(task.panel)
+
+    return redirect(url_for('index'))
 
 # @kanban.route("/edit_task/<task_id>", methods=["GET", "POST"])
 # def edit_task(task_id):
